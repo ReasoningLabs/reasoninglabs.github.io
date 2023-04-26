@@ -88,3 +88,18 @@ form button[type="submit"] {
     z-index: -1;
 }
 
+#subscribeForm {
+    display: flex;
+    flex-direction: row;
+}
+
+#subscribeBtn:hover {
+    background-color: #EEEEEE; /* change background color on hover */
+    color: #111111; /* change text color on hover */
+    cursor: pointer; /* change cursor on hover */
+}
+
+#subscribeBtn:active {
+    background-color: #000000; /* change background color when clicked */
+    color: #ffffff; /* change text color when clicked */
+  }

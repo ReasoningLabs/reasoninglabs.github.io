@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Reasoning Labs</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" type="text/css" href="style.css">
-	<!-- <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script> -->
+	<title>Reasoning Labs</title>
 </head>
 <body>
 	<!-- <canvas id="background"></canvas> -->
@@ -13,12 +14,26 @@
 	</div>
 
 	<div class="container hidden">
-		<h1>ReasoningLabs.com</h1>
-		<p>We are building the engineering tools of the future</p>
-		<form action="#" method="post">
+		<h1>Reasoning Labs</h1>
+		<p>We are building the engineering tools of the future</p>		
+		
+		<!-- <form action="#" method="post">
 			<input type="email" name="email" placeholder="Enter your email address">
-			<button type="submit">Submit</button>
+			<button type="submit">Subscribe</button>
+		</form> -->
+
+		<!-- <form action="https://formspree.io/f/myyalake" method="POST" id="subscribeForm">
+			<input type="email" name="email" id="emailInput" placeholder="Enter your email address">
+			<button type="submit" id="subscribeBtn">Subscribe</button>
+		</form> -->
+
+		<form action="https://api.web3forms.com/submit" method="POST" id="subscribeForm">
+			<input type="hidden" name="access_key" value="3e37b1b9-d97f-482d-bd10-960616ed3ba7">
+			<input type="email" name="email" placeholder="Enter your email" required>
+			<!-- <input type="hidden" name="redirect" value="https://web3forms.com/success"> -->
+			<button type="submit" id="subscribeBtn">Subscribe</button>		
 		</form>
+
 	</div>
 	<script src="script.js"></script>
 	<!-- <script src="animation.js"></script> -->
