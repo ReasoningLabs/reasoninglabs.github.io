@@ -1,0 +1,90 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: black;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: white;
+    transition: opacity 2s ease-in-out;
+}
+
+.hidden {
+    visibility: hidden;
+}
+
+.container.fade-in {
+    animation: fadein_anim 0.05s ease-in-out forwards;
+  }
+
+.eyes-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.eye {
+    width: 100px;
+    height: 100px;
+    background-color: black;
+    border-radius: 50%;
+    border: 32px solid rgb(255, 255, 255);
+    /*animation: blink 10s forwards;*/
+    animation: blink 3s ease-in-out 1;
+}
+
+.left-eye {
+    margin-right: 50px;
+}
+
+@keyframes blink {
+    0% {opacity: 0;}
+    70% {opacity: 1;}
+    80% {opacity: 1;}
+    100% {opacity: 0;}
+}
+
+@keyframes fadein_anim {
+    0% {opacity: 0;}
+    100% {opacity: 1;}
+}
+
+h1 {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+form input[type="email"] {
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid white;
+    border-radius: 5px;
+    margin-right: 10px;
+    background-color: black;
+    color: white;
+}
+
+form button[type="submit"] {
+    background-color: white;
+    color: black;
+    padding: 10px 20px;
+    border: 2px solid white;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+}
+
