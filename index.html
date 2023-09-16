@@ -8,6 +8,8 @@
 </head>
 <body>
 	<!-- <canvas id="background"></canvas> -->
+	<div id="particles-js"></div>
+
 	<div class="eyes-container">
 		<div class="eye left-eye"></div>
 		<div class="eye right-eye"></div>
@@ -17,16 +19,7 @@
 		<h1>Reasoning Labs</h1>
 		<p>We are building the engineering tools of the future</p>		
 		
-		<!-- <form action="#" method="post">
-			<input type="email" name="email" placeholder="Enter your email address">
-			<button type="submit">Subscribe</button>
-		</form> -->
-
-		<!-- <form action="https://formspree.io/f/myyalake" method="POST" id="subscribeForm">
-			<input type="email" name="email" id="emailInput" placeholder="Enter your email address">
-			<button type="submit" id="subscribeBtn">Subscribe</button>
-		</form> -->
-
+		<!-- action="https://formspree.io/f/myyalake" -->
 		<form action="https://api.web3forms.com/submit" method="POST" id="subscribeForm">
 			<input type="hidden" name="access_key" value="3e37b1b9-d97f-482d-bd10-960616ed3ba7">
 			<input type="email" name="email" placeholder="Enter your email" required>
@@ -36,6 +29,8 @@
 
 	</div>
 	<script src="script.js"></script>
+	<script src="particles.min.js"></script>
+    <script src="particle_script.js"></script>
 	<!-- <script src="animation.js"></script> -->
 
 </body>
