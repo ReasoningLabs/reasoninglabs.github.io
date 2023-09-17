@@ -2,7 +2,7 @@ body {
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
-    background-color: black;
+    background-color: rgb(168, 166, 166);
 }
 
 
@@ -34,7 +34,7 @@ body {
 .eye {
     width: 100px;
     height: 100px;
-    background-color: black;
+    /* background-color: black; */
     border-radius: 50%;
     border: 32px solid rgb(255, 255, 255);
     /*animation: blink 10s forwards;*/
@@ -68,7 +68,8 @@ form input[type="email"] {
     border: 2px solid white;
     border-radius: 5px;
     margin-right: 10px;
-    background-color: black;
+    background-color: rgb(168, 166, 166);
+    
     color: white;
 }
 
@@ -86,7 +87,7 @@ form button[type="submit"] {
     position: absolute;
     width: 100%;
     height: 100%;
-    background-color: #000;
+    /* background-color: #000; */
 }
 
 #subscribeForm {
@@ -96,7 +97,7 @@ form button[type="submit"] {
 
 #subscribeBtn:hover {
     background-color: #EEEEEE; /* change background color on hover */
-    color: #111111; /* change text color on hover */
+    /*color: #111111; /* change text color on hover */
     cursor: pointer; /* change cursor on hover */
 }
 
@@ -133,7 +134,7 @@ form button[type="submit"] {
         font-size: 16px;
         border: 2px solid white;
         border-radius: 5px;
-        background-color: black;
+        background-color: rgb(168, 166, 166);
         color: white;
         width: 100%;
         align-items: center;
