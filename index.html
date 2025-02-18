@@ -1,38 +1,255 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" type="text/css" href="style.css">
-	<title>Reasoning Labs</title>
+  <meta charset="UTF-8">
+  <title>Reasoning Labs</title>
+  <meta name="description" content="Engineering at the Speed of Thought.">
+  <link rel="canonical" href="https://ssi.inc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Social Meta Tags -->
+  <meta property="og:url" content="https://ssi.inc">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Reasoning Labs">
+  <meta property="og:description" content="Engineering at the Speed of Thought.">
+  <meta property="og:image" content="https://ssi.inc/public/og-preview.jpg">
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@ssi">
+  <meta property="twitter:domain" content="ssi.inc">
+  <meta property="twitter:url" content="https://ssi.inc">
+  <meta name="twitter:title" content="Reasoning Labs">
+  <meta name="twitter:description" content="Engineering at the Speed of Thought.">
+  <meta name="twitter:image" content="https://ssi.inc/public/og-preview.jpg">
+
+  <style>
+    /* Dual-layer blueprint background:
+       - Coarse grid: 40px squares in light grey.
+       - Fine grid: 10px subsquares in an even subtler grey.
+    */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      line-height: 1.4;
+      font-size: 16px;
+      color: #37474f;
+      background-color: #fff;
+      background-image: 
+        /* Coarse grid */
+        linear-gradient(90deg, #f0f0f0 1px, transparent 1px),
+        linear-gradient(180deg, #f0f0f0 1px, transparent 1px),
+        /* Fine grid */
+        linear-gradient(90deg, #e0e0e0 1px, transparent 1px),
+        linear-gradient(180deg, #e0e0e0 1px, transparent 1px);
+      background-size: 40px 40px, 40px 40px, 10px 10px, 10px 10px;
+      position: relative;
+    }
+
+    /* Canvas for Game of Life on the fine grid */
+    #gameOfLife {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* Main content container */
+    #maincontent {
+      margin: 70px auto;
+      max-width: 650px;
+      padding: 20px 10px;
+      position: relative;
+      z-index: 1;
+      background: transparent;
+    }
+    
+    /* Link styling */
+    a {
+      color: #1565c0;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
-	<!-- <canvas id="background"></canvas> -->
-	<div id="particles-js"></div>
+  <!-- Canvas for Game of Life -->
+  <canvas id="gameOfLife"></canvas>
 
-	<div class="eyes-container">
-		<div class="eye left-eye"></div>
-		<div class="eye right-eye"></div>
-	</div>
+  <div id="maincontent">
+    <h2 style="margin-bottom: 2px;">Reasoning Labs</h2>
+    <p><b>Engineering at the Speed of Thought</b></p>
+    <p>
+      We stand at the dawn of an age unlike any before—a time when thought itself is amplified,
+      when the barriers of labour and repetition begin to dissolve, and the mind of humanity is set free.
+    </p>
+    <p>
+      For centuries, we have been bound by necessity, forced to refine, replicate, and recombine what was already known.
+      But soon, these burdens will no longer be ours. Machines will take on the toil of reconstruction,
+      artificial intelligence will automate the past, and for the first time, we will be unshackled from repetition.
+    </p>
+    <p>
+      This is not the twilight of human purpose—it is its true beginning. Our role is not to repeat what has been,
+      but to decide and create what has never been. AI is not a replacement for our minds, but an extension of them,
+      a force to accelerate thought and open new frontiers.
+    </p>
+    <p>
+      Reasoning Labs develops these tools for engineering design. All engineers will become inventors and explore designs
+      at the speed of thought.
+    </p>
+    <p>
+      The future belongs not to those who repeat, but to those who reach beyond. We are the architects of the world to come.
+      Join us!
+    </p>
+    <p>Valters J. Zakrevskis, Daniel Gross, Daniel Levy</p>
+    <p>February 18, 2025</p>
+    <a href="https://x.com/Valtersjz" target="_blank" rel="noopener noreferrer">Contact</a>
+  </div>
 
-	<div class="container hidden">
-		<h1>Reasoning Labs</h1>
-		<p>We are building the engineering tools of the future</p>		
-		
-		<!-- action="https://formspree.io/f/myyalake" -->
-		
-		<form action="https://api.web3forms.com/submit" method="POST" id="subscribeForm">
-			<input type="hidden" name="access_key" value="3e37b1b9-d97f-482d-bd10-960616ed3ba7">
-			<input type="email" name="email" placeholder="Email" required>
-			<button type="submit" id="subscribeBtn">Subscribe</button>		
-		</form>
+  <script>
+    /***************************************************************
+     * Game of Life on Fine Grid (10px cells) – Lighter Grid Under Text
+     * with Opacity Fading from a Minimum Value to Full (Base) Opacity.
+     ***************************************************************/
+    window.addEventListener('load', function() {
+      const canvas = document.getElementById('gameOfLife');
+      const ctx = canvas.getContext('2d');
+      const cellSize = 10; // Fine grid cell size
+      let cols, rows, grid;
+      const exclusionMargin = 180; // Margin around main content (in pixels)
+      const baseAlpha = 0.7;       // Full opacity for cells outside the margin
+      const minAlpha = 0.1;        // Minimum opacity for cells directly under the text
 
-	</div>
-	
-	<script src="particles.min.js"></script>
-    <!--<script src="particle_script.js"></script>-->
-	<script src="script.js"></script>
-	<!-- <script src="animation.js"></script> -->
+      /**
+       * resizeCanvas - Adjusts the canvas dimensions and initializes a new grid.
+       */
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        cols = Math.floor(canvas.width / cellSize);
+        rows = Math.floor(canvas.height / cellSize);
+        grid = createGrid(rows, cols);
+      }
 
+      /**
+       * createGrid - Generates a grid with random live (1) or dead (0) cells.
+       */
+      function createGrid(rows, cols) {
+        const arr = [];
+        for (let y = 0; y < rows; y++) {
+          arr[y] = [];
+          for (let x = 0; x < cols; x++) {
+            // 20% chance for a cell to start alive
+            arr[y][x] = Math.random() < 0.2 ? 1 : 0;
+          }
+        }
+        return arr;
+      }
+
+      /**
+       * getDynamicGreyVal - Computes a dynamic grey value based on cell position and time.
+       * Returns a value oscillating roughly between 200 and 230.
+       */
+      function getDynamicGreyVal(x, y, t) {
+        return 215 + 15 * Math.sin((x + y) / 5 + t / 1000);
+      }
+
+      /**
+       * distanceToRect - Computes the shortest distance from a point to a rectangle.
+       * @param {number} x - The x-coordinate of the point.
+       * @param {number} y - The y-coordinate of the point.
+       * @param {DOMRect} rect - The bounding rectangle.
+       * @returns {number} The distance in pixels.
+       */
+      function distanceToRect(x, y, rect) {
+        const dx = x < rect.left ? rect.left - x : (x > rect.right ? x - rect.right : 0);
+        const dy = y < rect.top ? rect.top - y : (y > rect.bottom ? y - rect.bottom : 0);
+        return Math.sqrt(dx * dx + dy * dy);
+      }
+
+      /**
+       * drawGrid - Clears the canvas and draws live cells on the fine grid.
+       * For cells within the exclusion margin of the main content, their opacity is reduced
+       * linearly from the baseAlpha to a minimum opacity (minAlpha).
+       */
+      function drawGrid(t) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const mainRect = document.getElementById('maincontent').getBoundingClientRect();
+
+        for (let y = 0; y < rows; y++) {
+          for (let x = 0; x < cols; x++) {
+            const cellX = x * cellSize;
+            const cellY = y * cellSize;
+            const centerX = cellX + cellSize / 2;
+            const centerY = cellY + cellSize / 2;
+            const greyVal = getDynamicGreyVal(x, y, t);
+            // Compute distance from cell center to main content rectangle
+            const d = distanceToRect(centerX, centerY, mainRect);
+            // If within the exclusion margin, linearly interpolate between minAlpha and baseAlpha
+            const alpha = (d < exclusionMargin)
+              ? minAlpha + (baseAlpha - minAlpha) * (d / exclusionMargin)
+              : baseAlpha;
+
+            if (grid[y][x] === 1) {
+              ctx.fillStyle = `rgba(${Math.floor(greyVal)}, ${Math.floor(greyVal)}, ${Math.floor(greyVal)}, ${alpha})`;
+              ctx.fillRect(cellX, cellY, cellSize, cellSize);
+            }
+          }
+        }
+      }
+
+      /**
+       * updateGrid - Computes the next generation of cells using Conway's Game of Life rules.
+       */
+      function updateGrid() {
+        const nextGrid = [];
+        for (let y = 0; y < rows; y++) {
+          nextGrid[y] = [];
+          for (let x = 0; x < cols; x++) {
+            let aliveNeighbors = 0;
+            // Check all 8 neighbors (with edge wrapping)
+            for (let i = -1; i <= 1; i++) {
+              for (let j = -1; j <= 1; j++) {
+                if (i === 0 && j === 0) continue;
+                const newY = (y + i + rows) % rows;
+                const newX = (x + j + cols) % cols;
+                aliveNeighbors += grid[newY][newX];
+              }
+            }
+            if (grid[y][x] === 1) {
+              nextGrid[y][x] = (aliveNeighbors < 2 || aliveNeighbors > 3) ? 0 : 1;
+            } else {
+              nextGrid[y][x] = (aliveNeighbors === 3) ? 1 : 0;
+            }
+          }
+        }
+        grid = nextGrid;
+      }
+
+      let lastTime = 0;
+      const updateInterval = 100; // Update interval in milliseconds
+
+      /**
+       * animate - Main animation loop.
+       */
+      function animate(t) {
+        if (t - lastTime > updateInterval) {
+          updateGrid();
+          drawGrid(t);
+          lastTime = t;
+        }
+        requestAnimationFrame(animate);
+      }
+
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+      requestAnimationFrame(animate);
+    });
+  </script>
 </body>
 </html>
