@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Reasoning Labs</title>
+  <meta name="description" content="Reasoning Labs">
+  <link rel="canonical" href="https://reasoninglabs.com">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@100;200;300&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #000;
+      color: #fff8ee;
+      font-family: 'Raleway', system-ui, sans-serif;
+      font-weight: 200;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    canvas#hero {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+    .wordmark {
+      position: fixed;
+      top: 36px;
+      left: 56px;
+      font-weight: 100;
+      font-size: 13px;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: rgba(255, 248, 238, 0.85);
+      z-index: 3;
+    }
+    .tagline {
+      position: fixed;
+      top: 36px;
+      right: 56px;
+      font-weight: 100;
+      font-size: 11px;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: rgba(255, 200, 80, 0.78);
+      z-index: 3;
+      text-align: right;
+      line-height: 1.7;
+    }
+    .label {
+      position: absolute;
+      font-weight: 100;
+      font-size: 16px;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: rgba(255, 248, 238, 0.78);
+      pointer-events: none;
+      z-index: 2;
+      white-space: nowrap;
+      transform: translate(-50%, -50%);
+      animation: labelFade 6s ease-in-out infinite;
+    }
+    .label-1 { top: 22%; left: 50%; animation-delay: 0s; }
+    .label-2 { top: 70%; left: 30%; animation-delay: 2s; }
+    .label-3 { top: 70%; left: 70%; animation-delay: 4s; }
+    @keyframes labelFade {
+      0%, 100% { opacity: 0.45; }
+      50%      { opacity: 0.95; }
+    }
+    main {
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 0 6vw 14vh;
+      box-sizing: border-box;
+      pointer-events: none;
+      text-align: center;
+    }
+    h1 {
+      font-weight: 100;
+      font-size: clamp(28px, 4.4vw, 56px);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      line-height: 1.25;
+      margin: 0 0 1em 0;
+      color: #fff8ee;
+      max-width: 22ch;
+    }
+    p.thesis {
+      max-width: 48ch;
+      font-weight: 200;
+      font-size: 13px;
+      line-height: 1.85;
+      color: rgba(255, 248, 238, 0.65);
+      margin: 0;
+      letter-spacing: 0.04em;
+    }
+    footer {
+      position: fixed;
+      bottom: 36px;
+      left: 56px;
+      right: 56px;
+      display: flex;
+      justify-content: space-between;
+      font-weight: 100;
+      font-size: 11px;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: rgba(255, 248, 238, 0.55);
+      z-index: 3;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="hero"></canvas>
+
+  <div class="wordmark">Reasoning Labs</div>
+  <div class="tagline">Implicit adaptive reasoning<br>and self-control</div>
+
+  <div class="label label-1">Memory</div>
+  <div class="label label-2">Computation</div>
+  <div class="label label-3">Adaptation</div>
+
+  <main>
+    <h1>A unit of intelligence</h1>
+    <p class="thesis">
+      Memory. Computation. Adaptation. The smallest object that, composed into larger systems, produces reasoning &mdash; and corrects itself.
+    </p>
+  </main>
+  <footer>
+    <span>Valters Zakrevskis</span>
+    <span>MMXXVI</span>
+  </footer>
+
+  <script src="nav.js" defer></script>
+  <script>
+    (function () {
+      const canvas = document.getElementById('hero');
+      const ctx = canvas.getContext('2d');
+      let w, h, dpr;
+
+      const GLOW_SIZE = 512;
+      const glowSprite = (() => {
+        const off = document.createElement('canvas');
+        off.width = GLOW_SIZE; off.height = GLOW_SIZE;
+        const gc = off.getContext('2d');
+        const cx = GLOW_SIZE / 2;
+        const grad = gc.createRadialGradient(cx, cx, 0, cx, cx, cx);
+        grad.addColorStop(0.00, 'rgba(255, 220, 130, 1.0)');
+        grad.addColorStop(0.18, 'rgba(255, 200,  80, 0.55)');
+        grad.addColorStop(0.50, 'rgba(255, 200,  80, 0.12)');
+        grad.addColorStop(1.00, 'rgba(255, 200,  80, 0.0)');
+        gc.fillStyle = grad;
+        gc.fillRect(0, 0, GLOW_SIZE, GLOW_SIZE);
+        return off;
+      })();
+
+      function resize() {
+        dpr = window.devicePixelRatio || 1;
+        w = window.innerWidth;
+        h = window.innerHeight;
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
+        canvas.style.width = w + 'px';
+        canvas.style.height = h + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      const fires = [];
+      let nextFire = 0;
+
+      function step(t) {
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, w, h);
+
+        const cx = w / 2, cy = h * 0.42;
+        const time = t * 0.001;
+
+        if (time >= nextFire) {
+          fires.push({ at: time });
+          nextFire = time + 0.95 + Math.random() * 0.4;
+          if (fires.length > 8) fires.shift();
+        }
+
+        ctx.globalCompositeOperation = 'lighter';
+        for (const f of fires) {
+          const dt = time - f.at;
+          if (dt < 0 || dt > 1.4) continue;
+          const falloff = Math.max(0, Math.pow(1 - dt / 1.4, 2));
+          const size = (200 + dt * 320);
+          ctx.globalAlpha = 0.85 * falloff;
+          ctx.drawImage(glowSprite, cx - size / 2, cy - size / 2, size, size);
+        }
+        ctx.globalAlpha = 1;
+        ctx.globalCompositeOperation = 'source-over';
+
+        let bright = 0;
+        for (const f of fires) {
+          const dt = time - f.at;
+          if (dt >= 0 && dt < 0.32) bright = Math.max(bright, 1 - dt / 0.32);
+        }
+        const baseR = 16;
+        const r = baseR + bright * 6;
+        const breath = 1 + Math.sin(time * 1.6) * 0.06;
+
+        ctx.fillStyle = bright > 0
+          ? `rgba(255, ${230 - bright * 10}, ${130 + bright * 60}, 1)`
+          : 'rgba(255, 200, 80, 0.92)';
+        ctx.strokeStyle = `rgba(255, 240, 200, ${0.6 + bright * 0.4})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r * breath, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        requestAnimationFrame(step);
+      }
+
+      window.addEventListener('resize', resize);
+      resize();
+      requestAnimationFrame(step);
+    })();
+  </script>
+</body>
+</html>

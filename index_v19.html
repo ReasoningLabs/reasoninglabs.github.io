@@ -43,7 +43,6 @@
       color: #14110b;
       max-width: 16ch;
     }
-    h1 .accent { color: #b8860b; }
     p.thesis {
       max-width: 50ch;
       font-size: 16px;
@@ -58,17 +57,6 @@
       text-transform: uppercase; color: rgba(60, 48, 24, 0.6);
       z-index: 3;
     }
-    @media (max-width: 720px) {
-      .wordmark { top: 22px; left: 24px; font-size: 11px; letter-spacing: 0.2em; }
-      footer { bottom: 22px; right: 24px; left: 24px; text-align: right; font-size: 11px; letter-spacing: 0.2em; }
-      main { padding: 0 7vw 11vh; }
-      h1 { font-size: clamp(30px, 9vw, 56px); max-width: 14ch; line-height: 1.08; }
-      p.thesis { font-size: 14px; line-height: 1.6; }
-    }
-    @media (max-width: 420px) {
-      main { padding: 0 6vw 10vh; }
-      h1 { font-size: clamp(28px, 10vw, 44px); }
-    }
   </style>
 </head>
 <body>
@@ -76,9 +64,9 @@
   <div class="vignette"></div>
   <div class="wordmark">Reasoning Labs</div>
   <main>
-    <h1>Reinventing <span class="accent">super</span>intelligence</h1>
+    <h1>We are reinventing intelligence.</h1>
     <p class="thesis">
-      Knowledge is not intelligence. Today's models memorize. They do not adapt. We are building intelligence as what it actually is &mdash; a dynamical process, not a function. Native adaptive reasoning, memory, and self-correction.
+      Others build incrementally on a decade of architecture. We are reinventing it from the ground up &mdash; as what it actually is. A new branch of AI, grown from first principles.
     </p>
   </main>
   <footer>Valters Zakrevskis</footer>
@@ -132,15 +120,11 @@
 
       let nodes = [], edges = [], spikes = [];
 
-      // Graph topology is built once. Node positions are stored in normalized
-      // [0,1] coords (nx, ny) and edge curvature in a viewport-relative
-      // ctrlNorm; resize just remaps to pixels via updateScreenPositions().
       function buildGraph() {
         nodes = [];
         for (let i = 0; i < N_NODES; i++) {
           nodes.push({
-            nx: Math.random(), ny: Math.random(),
-            x: 0, y: 0,
+            x: Math.random() * w, y: Math.random() * h,
             r: 5 + Math.random() * 2.5,
             role: Math.random() < 0.18 ? 'input' : 'inner',
             fires: [], nextFire: 0.5 + Math.random() * 6, outE: [],
@@ -150,27 +134,18 @@
         for (let i = 0; i < nodes.length; i++) {
           const a = nodes[i];
           const others = nodes
-            .map((n, j) => ({ j, d2: (n.nx - a.nx) ** 2 + (n.ny - a.ny) ** 2 }))
+            .map((n, j) => ({ j, d2: (n.x - a.x) ** 2 + (n.y - a.y) ** 2 }))
             .filter(o => o.j !== i)
             .sort((x, y) => x.d2 - y.d2)
             .slice(0, NEAR_K + Math.floor(Math.random() * 2));
           for (const o of others) {
             if (Math.random() < 0.55) {
-              const e = { src: i, dst: o.j, ctrlNorm: (Math.random() - 0.5) * 0.05, ctrl: 0 };
+              const e = { src: i, dst: o.j, ctrl: (Math.random() - 0.5) * 50 };
               edges.push(e);
               a.outE.push(edges.length - 1);
             }
           }
         }
-      }
-
-      function updateScreenPositions() {
-        for (const n of nodes) {
-          n.x = n.nx * w;
-          n.y = n.ny * h;
-        }
-        const minDim = Math.min(w, h);
-        for (const e of edges) e.ctrl = e.ctrlNorm * minDim;
       }
 
       function resize() {
@@ -179,8 +154,7 @@
         canvas.width = w * dpr; canvas.height = h * dpr;
         canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        if (nodes.length === 0) buildGraph();
-        updateScreenPositions();
+        buildGraph();
       }
 
       function curvePoint(a, b, ctrl, u) {

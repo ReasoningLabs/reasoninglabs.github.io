@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Reasoning Labs</title>
+  <meta name="description" content="Reasoning Labs">
+  <link rel="canonical" href="https://reasoninglabs.com">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #050608;
+      color: #d8dce0;
+      font-family: 'Inter', system-ui, sans-serif;
+      font-weight: 300;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    canvas#flow {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+    .wordmark {
+      position: fixed;
+      top: 32px;
+      left: 32px;
+      font-size: 12px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #6a6a6a;
+      z-index: 2;
+    }
+    main {
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: flex-start;
+      padding: 0 8vw 18vh;
+      box-sizing: border-box;
+    }
+    h1 {
+      font-weight: 300;
+      font-size: clamp(28px, 4.4vw, 56px);
+      line-height: 1.18;
+      max-width: 22ch;
+      margin: 0 0 1em 0;
+      color: #f0f0eb;
+      letter-spacing: -0.005em;
+    }
+    p.thesis {
+      max-width: 44ch;
+      font-size: 14px;
+      line-height: 1.8;
+      color: #8c8a85;
+      margin: 0;
+    }
+    footer {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      font-size: 12px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #6a6a6a;
+      z-index: 2;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="flow"></canvas>
+  <div class="wordmark">Reasoning Labs</div>
+  <main>
+    <h1>A new branch of AI, grown from first principles.</h1>
+    <p class="thesis">
+      Frontier labs build incrementally on a decade of architecture. We are reinventing intelligence from the ground up &mdash; as what it actually is.
+    </p>
+  </main>
+  <footer>Valters Zakrevskis</footer>
+
+  <script src="nav.js" defer></script>
+  <script>
+    (function () {
+      const canvas = document.getElementById('flow');
+      const ctx = canvas.getContext('2d');
+      let w, h, dpr, particles;
+      const COUNT = 700;
+
+      function resize() {
+        dpr = window.devicePixelRatio || 1;
+        w = window.innerWidth;
+        h = window.innerHeight;
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
+        canvas.style.width = w + 'px';
+        canvas.style.height = h + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.fillStyle = '#050608';
+        ctx.fillRect(0, 0, w, h);
+      }
+
+      function init() {
+        particles = [];
+        for (let i = 0; i < COUNT; i++) {
+          particles.push({
+            x: Math.random() * w,
+            y: Math.random() * h,
+            life: Math.random() * 200,
+          });
+        }
+      }
+
+      function field(x, y, t) {
+        const s = 0.0028;
+        const a = Math.sin(x * s + t * 0.0003) + Math.cos(y * s * 1.3 - t * 0.0002);
+        const b = Math.cos(x * s * 0.7 - t * 0.00025) + Math.sin(y * s * 0.9 + t * 0.0004);
+        return Math.atan2(b, a) * 1.4;
+      }
+
+      function step(t) {
+        ctx.fillStyle = 'rgba(5, 6, 8, 0.06)';
+        ctx.fillRect(0, 0, w, h);
+
+        ctx.strokeStyle = 'rgba(200, 210, 220, 0.18)';
+        ctx.lineWidth = 0.5;
+
+        for (const p of particles) {
+          const ang = field(p.x, p.y, t);
+          const nx = p.x + Math.cos(ang) * 1.2;
+          const ny = p.y + Math.sin(ang) * 1.2;
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(nx, ny);
+          ctx.stroke();
+          p.x = nx;
+          p.y = ny;
+          p.life--;
+          if (p.life <= 0 || p.x < 0 || p.x > w || p.y < 0 || p.y > h) {
+            p.x = Math.random() * w;
+            p.y = Math.random() * h;
+            p.life = 80 + Math.random() * 200;
+          }
+        }
+
+        requestAnimationFrame(step);
+      }
+
+      window.addEventListener('resize', () => { resize(); init(); });
+      resize();
+      init();
+      requestAnimationFrame(step);
+    })();
+  </script>
+</body>
+</html>

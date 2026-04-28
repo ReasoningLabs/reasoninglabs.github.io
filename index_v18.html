@@ -12,7 +12,7 @@
   <style>
     html, body {
       margin: 0; padding: 0; height: 100%;
-      background: #ede5d4; color: #1a1611;
+      background: #060608; color: #f0eeea;
       font-family: 'Inter', system-ui, sans-serif;
       font-weight: 300; overflow: hidden;
       -webkit-font-smoothing: antialiased;
@@ -20,12 +20,12 @@
     canvas#net { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; }
     .vignette {
       position: fixed; inset: 0; pointer-events: none; z-index: 1;
-      background: radial-gradient(ellipse at center, transparent 0%, transparent 50%, rgba(237, 229, 212, 0.7) 100%);
+      background: radial-gradient(ellipse at center, transparent 0%, transparent 45%, rgba(6,6,8,0.85) 100%);
     }
     .wordmark {
       position: fixed; top: 32px; left: 40px;
       font-size: 12px; letter-spacing: 0.22em;
-      text-transform: uppercase; color: rgba(60, 48, 24, 0.85);
+      text-transform: uppercase; color: rgba(240, 238, 234, 0.85);
       font-weight: 500; z-index: 3;
     }
     main {
@@ -40,34 +40,22 @@
       line-height: 1.05;
       letter-spacing: -0.015em;
       margin: 0 0 0.7em 0;
-      color: #14110b;
+      color: #f8f6f0;
       max-width: 16ch;
     }
-    h1 .accent { color: #b8860b; }
     p.thesis {
       max-width: 50ch;
       font-size: 16px;
       font-weight: 300;
       line-height: 1.65;
-      color: rgba(40, 35, 25, 0.78);
+      color: rgba(240, 238, 234, 0.7);
       margin: 0;
     }
     footer {
       position: fixed; bottom: 32px; right: 40px;
       font-size: 12px; letter-spacing: 0.22em;
-      text-transform: uppercase; color: rgba(60, 48, 24, 0.6);
+      text-transform: uppercase; color: rgba(240, 238, 234, 0.55);
       z-index: 3;
-    }
-    @media (max-width: 720px) {
-      .wordmark { top: 22px; left: 24px; font-size: 11px; letter-spacing: 0.2em; }
-      footer { bottom: 22px; right: 24px; left: 24px; text-align: right; font-size: 11px; letter-spacing: 0.2em; }
-      main { padding: 0 7vw 11vh; }
-      h1 { font-size: clamp(30px, 9vw, 56px); max-width: 14ch; line-height: 1.08; }
-      p.thesis { font-size: 14px; line-height: 1.6; }
-    }
-    @media (max-width: 420px) {
-      main { padding: 0 6vw 10vh; }
-      h1 { font-size: clamp(28px, 10vw, 44px); }
     }
   </style>
 </head>
@@ -76,9 +64,9 @@
   <div class="vignette"></div>
   <div class="wordmark">Reasoning Labs</div>
   <main>
-    <h1>Reinventing <span class="accent">super</span>intelligence</h1>
+    <h1>We are reinventing intelligence.</h1>
     <p class="thesis">
-      Knowledge is not intelligence. Today's models memorize. They do not adapt. We are building intelligence as what it actually is &mdash; a dynamical process, not a function. Native adaptive reasoning, memory, and self-correction.
+      Others build incrementally on a decade of architecture. We are reinventing it from the ground up &mdash; as what it actually is. A new branch of AI, grown from first principles.
     </p>
   </main>
   <footer>Valters Zakrevskis</footer>
@@ -90,22 +78,22 @@
       const ctx = canvas.getContext('2d');
 
       const PALETTE = {
-        bg:        '#ede5d4',
-        edge:      'rgba(60, 48, 24, 0.18)',
-        trail0:    'rgba(180, 110, 30, 0)',
-        trail1:    'rgba(180, 110, 30, 0.45)',
-        trail2:    'rgba(150,  80, 20, 0.90)',
-        spikeHead: 'rgba(120,  60, 10, 0.95)',
+        bg:        '#060608',
+        edge:      'rgba(240, 238, 234, 0.09)',
+        trail0:    'rgba(255, 200, 80, 0)',
+        trail1:    'rgba(255, 200, 80, 0.32)',
+        trail2:    'rgba(255, 220, 130, 0.95)',
+        spikeHead: 'rgba(255, 230, 160, 0.95)',
         glow: [
-          [0.00, 'rgba(255, 220, 130, 0.95)'],
-          [0.18, 'rgba(255, 180,  60, 0.55)'],
-          [0.50, 'rgba(255, 180,  60, 0.16)'],
-          [1.00, 'rgba(255, 180,  60, 0.0)'],
+          [0.00, 'rgba(255, 220, 130, 1.0)'],
+          [0.18, 'rgba(255, 200,  80, 0.55)'],
+          [0.50, 'rgba(255, 200,  80, 0.12)'],
+          [1.00, 'rgba(255, 200,  80, 0.0)'],
         ],
-        nodeFill:   'rgba(80, 60, 30, 0.78)',
-        nodeStroke: 'rgba(120, 90, 40, 0.95)',
-        inputFill:  'rgba(40, 80, 130, 0.75)',
-        inputStroke:'rgba(50, 100, 160, 0.95)',
+        nodeFill:   'rgba(255, 200, 80, 0.78)',
+        nodeStroke: 'rgba(255, 230, 130, 0.92)',
+        inputFill:  'rgba(170, 230, 255, 0.78)',
+        inputStroke:'rgba(200, 240, 255, 0.92)',
         compBlend:  'lighter',
       };
       runSpikeNetwork(canvas, ctx, PALETTE);
@@ -132,15 +120,11 @@
 
       let nodes = [], edges = [], spikes = [];
 
-      // Graph topology is built once. Node positions are stored in normalized
-      // [0,1] coords (nx, ny) and edge curvature in a viewport-relative
-      // ctrlNorm; resize just remaps to pixels via updateScreenPositions().
       function buildGraph() {
         nodes = [];
         for (let i = 0; i < N_NODES; i++) {
           nodes.push({
-            nx: Math.random(), ny: Math.random(),
-            x: 0, y: 0,
+            x: Math.random() * w, y: Math.random() * h,
             r: 5 + Math.random() * 2.5,
             role: Math.random() < 0.18 ? 'input' : 'inner',
             fires: [], nextFire: 0.5 + Math.random() * 6, outE: [],
@@ -150,27 +134,18 @@
         for (let i = 0; i < nodes.length; i++) {
           const a = nodes[i];
           const others = nodes
-            .map((n, j) => ({ j, d2: (n.nx - a.nx) ** 2 + (n.ny - a.ny) ** 2 }))
+            .map((n, j) => ({ j, d2: (n.x - a.x) ** 2 + (n.y - a.y) ** 2 }))
             .filter(o => o.j !== i)
             .sort((x, y) => x.d2 - y.d2)
             .slice(0, NEAR_K + Math.floor(Math.random() * 2));
           for (const o of others) {
             if (Math.random() < 0.55) {
-              const e = { src: i, dst: o.j, ctrlNorm: (Math.random() - 0.5) * 0.05, ctrl: 0 };
+              const e = { src: i, dst: o.j, ctrl: (Math.random() - 0.5) * 50 };
               edges.push(e);
               a.outE.push(edges.length - 1);
             }
           }
         }
-      }
-
-      function updateScreenPositions() {
-        for (const n of nodes) {
-          n.x = n.nx * w;
-          n.y = n.ny * h;
-        }
-        const minDim = Math.min(w, h);
-        for (const e of edges) e.ctrl = e.ctrlNorm * minDim;
       }
 
       function resize() {
@@ -179,8 +154,7 @@
         canvas.width = w * dpr; canvas.height = h * dpr;
         canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        if (nodes.length === 0) buildGraph();
-        updateScreenPositions();
+        buildGraph();
       }
 
       function curvePoint(a, b, ctrl, u) {
@@ -279,8 +253,8 @@
           for (const ft of n.fires) bright = Math.max(bright, 1 - (t - ft) / FIRE_DECAY);
           const r = n.r + bright * 3.5;
           if (bright > 0) {
-            ctx.fillStyle = `rgba(255, ${200 + bright * 30}, ${100 + bright * 80}, 1)`;
-            ctx.strokeStyle = `rgba(180, 100, 30, ${0.7 + bright * 0.3})`;
+            ctx.fillStyle = `rgba(255, ${230 - bright * 5}, ${130 + bright * 60}, 1)`;
+            ctx.strokeStyle = `rgba(255, 240, 200, ${0.6 + bright * 0.4})`;
           } else if (n.role === 'input') {
             ctx.fillStyle = P.inputFill;
             ctx.strokeStyle = P.inputStroke;

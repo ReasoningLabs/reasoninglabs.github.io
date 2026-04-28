@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Reasoning Labs</title>
+  <meta name="description" content="Reasoning Labs">
+  <link rel="canonical" href="https://reasoninglabs.com">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #000;
+      color: #e8e6e1;
+      font-family: 'Inter', system-ui, sans-serif;
+      font-weight: 300;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wordmark {
+      position: fixed;
+      top: 32px;
+      left: 32px;
+      font-size: 12px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #6a6a6a;
+      z-index: 2;
+    }
+    main {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 8vh 6vw;
+      box-sizing: border-box;
+      text-align: center;
+    }
+    .stage {
+      position: relative;
+      width: 100%;
+      max-width: 22ch;
+      height: 4.6em;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-weight: 300;
+      font-size: clamp(30px, 5vw, 64px);
+      line-height: 1.15;
+      letter-spacing: -0.005em;
+      color: #f5f3ee;
+    }
+    .line {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 1.2s ease, transform 1.2s ease;
+      max-width: 22ch;
+      margin: 0 auto;
+    }
+    .line.is-active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .line.is-leaving {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    p.thesis {
+      max-width: 42ch;
+      font-size: 14px;
+      line-height: 1.8;
+      color: #8c8a85;
+      margin: 3em 0 0;
+    }
+    footer {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      font-size: 12px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #6a6a6a;
+      z-index: 2;
+    }
+  </style>
+</head>
+<body>
+  <div class="wordmark">Reasoning Labs</div>
+  <main>
+    <div class="stage" id="stage" aria-live="polite"></div>
+    <p class="thesis">
+      Small units that remember, compute, and adapt &mdash; composed into reasoning that corrects itself.
+    </p>
+  </main>
+  <footer>Valters Zakrevskis</footer>
+
+  <script src="nav.js" defer></script>
+  <script>
+    (function () {
+      const lines = [
+        'Knowledge is not intelligence.',
+        'Adaptation is.',
+        'Intelligence is a process, not a function.',
+        'We are reinventing it.',
+      ];
+      const stage = document.getElementById('stage');
+      let i = 0;
+      let current = null;
+
+      function show(text) {
+        const next = document.createElement('div');
+        next.className = 'line';
+        next.textContent = text;
+        stage.appendChild(next);
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          next.classList.add('is-active');
+        }));
+
+        if (current) {
+          const old = current;
+          old.classList.remove('is-active');
+          old.classList.add('is-leaving');
+          setTimeout(() => old.remove(), 1300);
+        }
+        current = next;
+      }
+
+      function tick() {
+        show(lines[i % lines.length]);
+        i++;
+      }
+
+      tick();
+      setInterval(tick, 3600);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Reasoning Labs</title>
+  <meta name="description" content="Reasoning Labs">
+  <link rel="canonical" href="https://reasoninglabs.com">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      background-color: #fafaf7;
+      color: #2a2a28;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-weight: 300;
+      font-size: 14px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      background-image:
+        linear-gradient(90deg, rgba(0,0,0,0.045) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(0,0,0,0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,0.025) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(0,0,0,0.025) 1px, transparent 1px);
+      background-size: 80px 80px, 80px 80px, 16px 16px, 16px 16px;
+    }
+    canvas#life {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.55;
+    }
+    .wordmark {
+      position: fixed;
+      top: 28px;
+      left: 32px;
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #7a7a76;
+      z-index: 2;
+    }
+    main {
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 12vh 32px;
+      box-sizing: border-box;
+    }
+    h1 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-weight: 300;
+      font-size: clamp(28px, 4.4vw, 52px);
+      line-height: 1.2;
+      margin: 0 0 1.4em 0;
+      color: #1a1a18;
+      letter-spacing: -0.005em;
+      max-width: 18ch;
+    }
+    p {
+      max-width: 56ch;
+      margin: 0 0 1.2em 0;
+      color: #44443f;
+    }
+    footer {
+      position: fixed;
+      bottom: 28px;
+      left: 32px;
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #5a5a55;
+      z-index: 2;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="life"></canvas>
+  <div class="wordmark">Reasoning Labs</div>
+  <main>
+    <h1>We are reinventing intelligence.</h1>
+    <p>
+      Today's AI memorizes; it does not adapt. Knowledge is not intelligence.
+    </p>
+    <p>
+      We are building intelligence as what it actually is &mdash; a dynamical process composed of small units capable of memory, computation, and adaptation. Combined into a larger system, they produce adaptive reasoning and self&#8209;correction.
+    </p>
+  </main>
+  <footer>Valters Zakrevskis</footer>
+
+  <script src="nav.js" defer></script>
+  <script>
+    window.addEventListener('load', function () {
+      const canvas = document.getElementById('life');
+      const ctx = canvas.getContext('2d');
+      const cellSize = 16;
+      let cols, rows, grid;
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        cols = Math.floor(canvas.width / cellSize);
+        rows = Math.floor(canvas.height / cellSize);
+        grid = [];
+        for (let y = 0; y < rows; y++) {
+          grid[y] = [];
+          for (let x = 0; x < cols; x++) {
+            grid[y][x] = Math.random() < 0.18 ? 1 : 0;
+          }
+        }
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let y = 0; y < rows; y++) {
+          for (let x = 0; x < cols; x++) {
+            if (grid[y][x] === 1) {
+              ctx.fillStyle = 'rgba(40, 50, 60, 0.18)';
+              ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+            }
+          }
+        }
+      }
+
+      function update() {
+        const next = [];
+        for (let y = 0; y < rows; y++) {
+          next[y] = [];
+          for (let x = 0; x < cols; x++) {
+            let n = 0;
+            for (let i = -1; i <= 1; i++) {
+              for (let j = -1; j <= 1; j++) {
+                if (i === 0 && j === 0) continue;
+                n += grid[(y + i + rows) % rows][(x + j + cols) % cols];
+              }
+            }
+            if (grid[y][x] === 1) next[y][x] = (n < 2 || n > 3) ? 0 : 1;
+            else next[y][x] = (n === 3) ? 1 : 0;
+          }
+        }
+        grid = next;
+      }
+
+      let last = 0;
+      function loop(t) {
+        if (t - last > 180) {
+          update();
+          draw();
+          last = t;
+        }
+        requestAnimationFrame(loop);
+      }
+
+      window.addEventListener('resize', resize);
+      resize();
+      requestAnimationFrame(loop);
+    });
+  </script>
+</body>
+</html>
